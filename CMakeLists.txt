@@ -21,14 +21,6 @@ add_library(
 )
 add_library(open62541cpp::open62541cpp ALIAS open62541cpp_open62541cpp)
 
-include(GenerateExportHeader)
-generate_export_header(
-    open62541cpp_open62541cpp
-    BASE_NAME open62541cpp
-    EXPORT_FILE_NAME export/open62541cpp/open62541cpp_export.hpp
-    CUSTOM_CONTENT_FROM_VARIABLE pragma_suppress_c4251
-)
-
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(open62541cpp_open62541cpp PUBLIC OPEN62541CPP_STATIC_DEFINE)
 endif()
