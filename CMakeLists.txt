@@ -15,9 +15,8 @@ include(cmake/variables.cmake)
 
 # ---- Declare library ----
 
-add_library(
-    open62541cpp_open62541cpp
-    source/open62541cpp.cpp
+add_library(open62541cpp_open62541cpp
+    source/server.cpp
 )
 add_library(open62541cpp::open62541cpp ALIAS open62541cpp_open62541cpp)
 
