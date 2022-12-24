@@ -17,6 +17,7 @@ include(cmake/variables.cmake)
 
 add_library(open62541cpp_open62541cpp
     source/server.cpp
+    source/status_code.cpp
 )
 add_library(open62541cpp::open62541cpp ALIAS open62541cpp_open62541cpp)
 
