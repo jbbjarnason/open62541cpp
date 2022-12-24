@@ -1,8 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <chrono>
 #include <functional>
 #include <memory>
-#include <chrono>
 #include <utility>
 
 struct UA_Server;
@@ -29,12 +30,22 @@ public:
   std::chrono::milliseconds run_iterate(bool wait_internal);
   status_code run_shutdown();
 
-  status_code add_timed_callback(std::invocable<void, server&> auto cb);
+  // add future callback after nanoseconds
+  using timer_cb_t = std::function<void()>;
+  status_code add_timed_callback(timer_cb_t cb, std::chrono::nanoseconds const&);
 
 private:
+  using callback_id = std::uint64_t;
+  struct callback_context{
+    callback_id id{};
+    timer_cb_t cb{nullptr};
+    server* self;
+  };
+
   std::unique_ptr<UA_Server, std::function<void(UA_Server *)>> server_{nullptr};
   std::unique_ptr<server_config, std::function<void(server_config *)>> config_{nullptr};
   std::unique_ptr<bool> running_{std::make_unique<bool>(false)};
+  std::vector<callback_context> timed_callback_mem_{};
 };
 
 } // namespace opc::ua

@@ -49,8 +49,9 @@ target_include_directories(
 
 target_compile_features(open62541cpp_open62541cpp PUBLIC cxx_std_20)
 
-find_package(fmt REQUIRED)
-target_link_libraries(open62541cpp_open62541cpp PRIVATE fmt::fmt)
+find_package(fmt CONFIG REQUIRED)
+find_package(open62541 CONFIG REQUIRED)
+target_link_libraries(open62541cpp_open62541cpp PRIVATE fmt::fmt open62541::open62541)
 
 # ---- Install rules ----
 

@@ -8,7 +8,8 @@ include(../cmake/folders.cmake)
 # ---- Dependencies ----
 
 if(PROJECT_IS_TOP_LEVEL)
-  find_package(open62541cpp REQUIRED)
+  find_package(fmt CONFIG REQUIRED)
+  find_package(open62541 CONFIG REQUIRED)
   enable_testing()
 endif()
 
@@ -25,6 +26,7 @@ FetchContent_MakeAvailable(ut)
 add_executable(open62541cpp_test source/coro_test.cpp)
 target_link_libraries(open62541cpp_test
 PRIVATE
+  fmt::fmt
   open62541cpp::open62541cpp
   Boost::ut
 )
