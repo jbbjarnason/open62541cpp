@@ -1,0 +1,10 @@
+{
+  "name": "open62541cpp",
+  "version-semver": "0.1.0",
+  "dependencies": [
+    "fmt",
+    "open62541",
+    "cppcoro"
+  ],
+  "builtin-baseline": "62d01b70df227850b728f5050418b917ad6d2b32"
+}

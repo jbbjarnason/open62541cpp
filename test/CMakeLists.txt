@@ -22,7 +22,7 @@ FetchContent_MakeAvailable(ut)
 
 # ---- Tests ----
 
-add_executable(open62541cpp_test source/open62541cpp_test.cpp)
+add_executable(open62541cpp_test source/coro_test.cpp)
 target_link_libraries(open62541cpp_test
 PRIVATE
   open62541cpp::open62541cpp

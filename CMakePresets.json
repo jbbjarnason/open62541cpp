@@ -19,7 +19,11 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg-sysroot"
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg-sysroot",
+        "VCPKG_OVERLAY_PORTS": "${sourceDir}/vcpkg-overlays/ports",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-clang",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-linux-clang.cmake"
       }
     },
     {
