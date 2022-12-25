@@ -1,10 +1,11 @@
 #pragma once
 
-#include <vector>
+#include "server_config.hpp"
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <utility>
+#include <vector>
 
 struct UA_Server;
 
@@ -43,7 +44,7 @@ private:
   };
 
   std::unique_ptr<UA_Server, std::function<void(UA_Server *)>> server_{nullptr};
-  std::unique_ptr<server_config, std::function<void(server_config *)>> config_{nullptr};
+  server_config config_{};
   std::unique_ptr<bool> running_{std::make_unique<bool>(false)};
   std::vector<callback_context> timed_callback_mem_{};
 };

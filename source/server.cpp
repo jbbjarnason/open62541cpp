@@ -8,22 +8,17 @@
 inline constexpr auto destroy_server{
     [](UA_Server *server) -> void { UA_Server_delete(server); }};
 
-// Config is maintained by C library, so we should not double erase it
-inline constexpr auto dont_destroy_config{[](UA_ServerConfig *) -> void {}};
-
 namespace opc::ua {
 
 server::server()
     : server_(UA_Server_new(), destroy_server),
-      config_(
-          static_cast<server_config *>(UA_Server_getConfig(server_.get()))) {}
+      config_(UA_Server_getConfig(server_.get())) {}
 
 server::server(server_config &&server_conf)
     : server_(
-          UA_Server_newWithConfig(static_cast<UA_ServerConfig *>(&server_conf)),
+          UA_Server_newWithConfig(server_conf.get().get()),
           destroy_server),
-      config_(
-          static_cast<server_config *>(UA_Server_getConfig(server_.get()))) {}
+      config_(std::move(server_conf)) {}
 
 status_code server::run() {
   running_ = std::make_unique<bool>(true);
