@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 struct UA_ServerConfig;
 
@@ -12,7 +12,7 @@ public:
   server_config() = default;
   explicit server_config(UA_ServerConfig *config);
 
-  auto const &get() { return config_; }
+  [[nodiscard]] auto const &get() const noexcept { return config_; }
 
 private:
   std::unique_ptr<UA_ServerConfig, std::function<void(UA_ServerConfig *)>>

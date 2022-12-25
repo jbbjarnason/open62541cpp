@@ -1,6 +1,9 @@
+#include <algorithm>
+
 #include "open62541cpp/server.hpp"
 #include "open62541cpp/server_config.hpp"
 #include "open62541cpp/status_code.hpp"
+#include "open62541cpp/timer.hpp"
 
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
@@ -15,9 +18,7 @@ server::server()
       config_(UA_Server_getConfig(server_.get())) {}
 
 server::server(server_config &&server_conf)
-    : server_(
-          UA_Server_newWithConfig(server_conf.get().get()),
-          destroy_server),
+    : server_(UA_Server_newWithConfig(server_conf.get().get()), destroy_server),
       config_(std::move(server_conf)) {}
 
 status_code server::run() {
@@ -34,41 +35,16 @@ std::chrono::milliseconds server::run_iterate(bool wait_internal) {
 status_code server::run_shutdown() {
   return status_code{UA_Server_run_shutdown(server_.get())};
 }
-
-status_code server::add_timed_callback(timer_cb_t cb, std::chrono::nanoseconds const& ns) {
-  constexpr auto c_callback{[](UA_Server *server, void *data) -> void {
-    decltype(auto) ctx{static_cast<callback_context *>(data)};
-    if (ctx == nullptr || ctx->self == nullptr) {
-      throw std::runtime_error("open62541 timer callback error");
-    }
-    try {
-      std::invoke(ctx->cb);
-    } catch (const std::exception &ex) {
-      auto it [[maybe_unused]]{std::remove_if(
-          std::begin(ctx->self->timed_callback_mem_),
-          std::end(ctx->self->timed_callback_mem_),
-          [&ctx](const auto &it) -> bool { return it.id == ctx->id; })};
-      UA_Server_removeCallback(ctx->self->server_.get(), ctx->id); // redundant?
-      throw;
-    }
-    auto it [[maybe_unused]]{std::remove_if(
-        std::begin(ctx->self->timed_callback_mem_),
-        std::end(ctx->self->timed_callback_mem_),
-        [&ctx](const auto &it) -> bool { return it.id == ctx->id; })};
-    UA_Server_removeCallback(ctx->self->server_.get(), ctx->id); // redundant?
-  }};
-
-  callback_context ctx{.id = {}, .cb = std::move(cb), .self = this};
-  const auto future{
-      UA_DateTime_nowMonotonic() +
-      static_cast<decltype(UA_DateTime_nowMonotonic())>(ns.count() / 100)};
-  const auto code{status_code{UA_Server_addTimedCallback(
-      server_.get(), c_callback, &ctx, future, &ctx.id)}};
-  if (code.is_bad()) {
-    return code;
-  }
-  timed_callback_mem_.emplace_back(std::move(ctx));
-  return code;
+timer server::new_timer() const { return timer{this}; }
+std::shared_ptr<timer> server::new_discardable_timer() {
+  // Let's remove all timers which are not waiting from memory
+  auto const forward_it [[maybe_unused]]{
+      std::remove_if(std::begin(timer_refs_), std::end(timer_refs_),
+                     [](const auto &timer_item) -> bool {
+                       return timer_item->template get<timer::state>() !=
+                              timer::state::waiting;
+                     })};
+  return timer_refs_.emplace_back(std::make_shared<timer>(this));
 }
 
 } // namespace opc::ua
