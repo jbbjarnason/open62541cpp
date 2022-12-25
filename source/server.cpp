@@ -42,7 +42,7 @@ std::shared_ptr<timer> server::new_discardable_timer() {
       std::remove_if(std::begin(timer_refs_), std::end(timer_refs_),
                      [](const auto &timer_item) -> bool {
                        return timer_item->template get<timer::state>() !=
-                              timer::state::waiting;
+                              timer::state::active;
                      })};
   return timer_refs_.emplace_back(std::make_shared<timer>(this));
 }
