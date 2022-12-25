@@ -5,11 +5,10 @@
 #include <optional>
 #include <type_traits>
 
-#include <open62541cpp/status_code.hpp>
-
 namespace opc::ua {
 
-struct server;
+class server;
+class status_code;
 
 class timer {
 public:
@@ -91,7 +90,7 @@ private:
   state state_{state::undefined};
   type type_{type::single_shot};
 
-  status_code changedInterval();
+  void changedInterval();
 
 };
 

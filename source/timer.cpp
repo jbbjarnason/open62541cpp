@@ -1,6 +1,7 @@
 #include <open62541/server.h>
 #include <open62541cpp/server.hpp>
 #include <open62541cpp/timer.hpp>
+#include <open62541cpp/status_code.hpp>
 
 namespace opc::ua {
 
@@ -78,13 +79,14 @@ void timer::stop() {
   UA_Server_removeCallback(owner_->c_server().get(), id_);
 }
 
-status_code timer::changedInterval() {
+void timer::changedInterval() {
   if (owner_ == nullptr) {
     // Todo log
-    return status_code{UA_STATUSCODE_BADUNEXPECTEDERROR};
+    return;
   }
-  return status_code{UA_Server_changeRepeatedCallbackInterval(
-      owner_->c_server().get(), id_, interval_->count())};
+  const auto code[[maybe_unused]]{status_code{UA_Server_changeRepeatedCallbackInterval(
+      owner_->c_server().get(), id_, interval_->count())}};
+  // Todo log code
 }
 
 } // namespace opc::ua
